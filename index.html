@@ -204,16 +204,6 @@ h1,h2,h3{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:
 .service-card .btn{margin-top:auto}
 .services-note{margin-top:22px;color:var(--text-dim);font-size:.9rem}
 
-/* TEAM */
-.team-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:8px}
-@media (min-width:640px){ .team-grid{grid-template-columns:repeat(3,1fr)} }
-.team-card{background:var(--bg-card);border:1px solid var(--line);border-radius:2px;overflow:hidden;transition:border-color .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease)}
-.team-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:6px 6px 0 rgba(201,162,75,.14)}
-.team-card img{width:100%;aspect-ratio:4/5;object-fit:cover;filter:grayscale(.15)}
-.team-card-body{padding:20px 22px}
-.team-card h3{font-family:'Inter',sans-serif;text-transform:none;font-weight:800;font-size:1.1rem;letter-spacing:0}
-.team-card p{color:var(--text-dim);font-size:.9rem;margin-top:4px;font-weight:500}
-
 /* GALLERY */
 .gallery{padding-block:90px;background:var(--bg-alt);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .gallery-note{color:var(--text-dim);margin-bottom:26px;font-size:.95rem}
@@ -307,7 +297,6 @@ h1,h2,h3{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:
     </a>
     <nav class="main-nav" aria-label="Hlavní navigace">
       <a href="#sluzby">Služby</a>
-      <a href="#tym">Tým</a>
       <a href="#galerie">Galerie</a>
       <a href="#oteviraci-doba">Otevírací doba</a>
       <a href="#kontakt">Kontakt</a>
@@ -324,7 +313,6 @@ h1,h2,h3{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:
 <div class="mobile-menu" id="mobileMenu">
   <nav aria-label="Mobilní navigace">
     <a href="#sluzby">Služby</a>
-    <a href="#tym">Tým</a>
     <a href="#galerie">Galerie</a>
     <a href="#oteviraci-doba">Otevírací doba</a>
     <a href="#kontakt">Kontakt</a>
@@ -438,39 +426,6 @@ h1,h2,h3{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:
         </article>
       </div>
       <p class="services-note reveal">Orientační ceník — přesnou cenu vždy potvrdíme při objednání.</p>
-    </div>
-  </section>
-
-  <section class="about" id="tym" style="padding-top:80px">
-    <div class="container">
-      <div class="section-head reveal">
-        <p class="section-eyebrow">Náš tým</p>
-        <h2 class="section-title">Barbeři</h2>
-        <div class="section-underline"></div>
-      </div>
-      <div class="team-grid">
-        <article class="team-card reveal">
-          <img src="https://images.unsplash.com/photo-1553521041-d168abd31de3?w=500&q=70&auto=format&fit=crop" alt="Barber s nůžkami" loading="lazy">
-          <div class="team-card-body">
-            <h3>Master barber</h3>
-            <p>Klasické i moderní techniky pánského stříhání</p>
-          </div>
-        </article>
-        <article class="team-card reveal">
-          <img src="https://images.unsplash.com/photo-1598524374912-6b0b0bab43dd?w=500&q=70&auto=format&fit=crop" alt="Barber upravuje styling klientovi" loading="lazy">
-          <div class="team-card-body">
-            <h3>Fade specialista</h3>
-            <p>Čisté přechody a kontury na míru</p>
-          </div>
-        </article>
-        <article class="team-card reveal">
-          <img src="https://images.unsplash.com/photo-1589985494639-69e60c82cab2?w=500&q=70&auto=format&fit=crop" alt="Barber upravuje strojkem kontury" loading="lazy">
-          <div class="team-card-body">
-            <h3>Specialista na vousy</h3>
-            <p>Holení břitvou a precizní úprava vousů</p>
-          </div>
-        </article>
-      </div>
     </div>
   </section>
 
@@ -623,7 +578,7 @@ h1,h2,h3{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:
   });
 
   /* Reveal on scroll, staggered per section */
-  document.querySelectorAll('.services-grid, .team-grid, .gallery-grid, .contact-list').forEach(function(group){
+  document.querySelectorAll('.services-grid, .gallery-grid, .contact-list').forEach(function(group){
     Array.prototype.forEach.call(group.children, function(el, i){
       if(el.classList.contains('reveal')) el.style.transitionDelay = Math.min(i * 60, 420) + 'ms';
     });
