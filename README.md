@@ -2,6 +2,6 @@
 
 Moderní jednostránkový web pro barbershop Arty Fadez (Štěpařská).
 
-- `index.html` / `style.css` / `script.js` — statický web, žádný build krok
-- Kontaktní formulář odesílá přes `mailto:` (funguje i na statickém hostingu bez backendu)
+- `index.html` — statický web jako jediný soubor (CSS i JS inline), žádný build krok
+- Kontakt: telefon, e-mail a Instagram jako přímé odkazy (žádný fake formulář bez backendu)
 - Publikováno přes GitHub Pages
