@@ -1,0 +1,12 @@
+{
+  "name": "arty-fadez-od-nuly-2-rezervace",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "resend": "^4.0.1"
+  },
+  "devDependencies": {
+    "pg": "^8.13.1"
+  }
+}

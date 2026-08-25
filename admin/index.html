@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — rezervace | Arty Fadez</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  body { padding: 40px 20px; }
+  .admin-wrap { max-width: 1040px; margin: 0 auto; }
+  .admin-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; font-size: 0.88rem; }
+  .admin-table th, .admin-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+  .admin-table th { background: var(--bg-alt); color: var(--fg-dim); text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.06em; }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-empty { padding: 30px; text-align: center; color: var(--fg-dim); }
+  .admin-actions { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .btn-del { background: #82181a; color: #fff; border: none; padding: 7px 14px; border-radius: .5rem; font-size: 0.78rem; cursor: pointer; }
+  .btn-del:hover { background: #a12022; }
+  .admin-table-scroll { overflow-x: auto; }
+  .badge-typ { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+  .badge-rezervace { background: rgba(121,201,138,.15); color: #79c98a; }
+  .badge-blokace { background: rgba(252,187,0,.15); color: var(--amber-400); }
+  .blok-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; }
+  .blok-box h2 { font-size: 1.2rem; margin: 0 0 16px; font-family: 'Playfair Display', serif; }
+  .blok-form { display: flex; gap: 14px; flex-wrap: wrap; align-items: end; }
+  .blok-form label { display: flex; flex-direction: column; gap: 6px; font-size: 0.82rem; font-weight: 600; color: var(--fg-dim); }
+  .blok-form input, .blok-form select { padding: 10px 12px; border: 1px solid var(--border); border-radius: .5rem; font-family: 'Inter', sans-serif; background: var(--bg-alt); color: var(--fg); }
+  .blok-msg { width: 100%; margin: 8px 0 0; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+  <div class="admin-wrap">
+    <div class="admin-actions">
+      <h1 style="font-family:'Playfair Display',serif;font-size:1.8rem;margin:0;">Arty Fadez — Rezervace</h1>
+      <button class="btn btn-outline btn-sm" id="obnovit">Obnovit</button>
+    </div>
+
+    <div class="blok-box">
+      <h2>Zablokovat termín (dovolená, oběd, volno)</h2>
+      <form id="blok-form" class="blok-form">
+        <label>Datum
+          <input type="date" name="datum" required>
+        </label>
+        <label>Režim
+          <select name="mod" id="blok-mod">
+            <option value="den">Celý den</option>
+            <option value="slot">Jeden čas</option>
+          </select>
+        </label>
+        <label id="blok-cas-label" style="display:none;">Čas
+          <input type="time" name="cas" step="1800">
+        </label>
+        <button type="submit" class="btn btn-primary btn-sm">Zablokovat</button>
+        <p class="blok-msg" id="blok-msg"></p>
+      </form>
+    </div>
+
+    <div id="obsah">Načítám…</div>
+  </div>
+
+<script>
+async function nacistRezervace() {
+  const obsah = document.getElementById('obsah');
+  try {
+    const res = await fetch('/api/admin-bookings');
+    const data = await res.json();
+    if (!data.ok) {
+      obsah.innerHTML = '<p class="admin-empty">Chyba: ' + (data.error || 'nepodařilo se načíst') + '</p>';
+      return;
+    }
+    if (data.rezervace.length === 0) {
+      obsah.innerHTML = '<p class="admin-empty">Zatím žádné rezervace ani blokace.</p>';
+      return;
+    }
+    const radky = data.rezervace.map((r) => {
+      const jeBlokace = r.typ === 'blokace';
+      const badge = jeBlokace
+        ? '<span class="badge-typ badge-blokace">Blokace</span>'
+        : '<span class="badge-typ badge-rezervace">Rezervace</span>';
+      return `
+      <tr data-id="${r.id}">
+        <td>${badge}</td>
+        <td>${r.datum}</td>
+        <td>${r.cas}</td>
+        <td>${jeBlokace ? '—' : escapeHtml(r.jmeno || '')}</td>
+        <td>${jeBlokace ? '—' : escapeHtml(r.sluzba || '')}</td>
+        <td>${jeBlokace ? '—' : `<a class="link" href="tel:${escapeHtml(r.telefon || '')}">${escapeHtml(r.telefon || '')}</a>`}</td>
+        <td>${jeBlokace ? '—' : `<a class="link" href="mailto:${escapeHtml(r.email || '')}">${escapeHtml(r.email || '')}</a>`}</td>
+        <td>${jeBlokace ? '—' : escapeHtml(r.poznamka || '—')}</td>
+        <td><button class="btn-del" onclick="smazatRezervaci(${r.id})">${jeBlokace ? 'Odblokovat' : 'Zrušit'}</button></td>
+      </tr>
+    `;
+    }).join('');
+    obsah.innerHTML = `
+      <div class="admin-table-scroll">
+        <table class="admin-table">
+          <thead><tr><th>Typ</th><th>Datum</th><th>Čas</th><th>Jméno</th><th>Služba</th><th>Telefon</th><th>E-mail</th><th>Poznámka</th><th></th></tr></thead>
+          <tbody>${radky}</tbody>
+        </table>
+      </div>
+    `;
+  } catch (e) {
+    obsah.innerHTML = '<p class="admin-empty">Nepodařilo se načíst rezervace.</p>';
+  }
+}
+
+async function smazatRezervaci(id) {
+  if (!confirm('Opravdu to zrušit / odblokovat?')) return;
+  await fetch('/api/admin-bookings?id=' + id, { method: 'DELETE' });
+  nacistRezervace();
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+document.getElementById('obnovit').addEventListener('click', nacistRezervace);
+
+document.getElementById('blok-mod').addEventListener('change', (e) => {
+  document.getElementById('blok-cas-label').style.display = e.target.value === 'slot' ? 'flex' : 'none';
+});
+
+document.getElementById('blok-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('blok-msg');
+  const fd = new FormData(e.target);
+  const payload = Object.fromEntries(fd.entries());
+  msg.textContent = 'Ukládám…';
+  try {
+    const res = await fetch('/api/admin-blokace', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Chyba');
+    msg.textContent = `Zablokováno (${data.zablokovano} termín/ů).`;
+    e.target.reset();
+    nacistRezervace();
+  } catch (err) {
+    msg.textContent = 'Chyba: ' + err.message;
+  }
+});
+
+nacistRezervace();
+</script>
+</body>
+</html>
